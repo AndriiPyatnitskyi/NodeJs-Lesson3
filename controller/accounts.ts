@@ -17,7 +17,7 @@ const getAccounts: any = async (req: Request, res: Response) => {
     res.send(accounts);
 };
 
-const getAccountsById: any = async (req: Request, res: Response) => {
+const getAccountById: any = async (req: Request, res: Response) => {
 
     const id = req.params.id; // получаем id
     const content = fs.readFileSync(filePath, "utf8");
@@ -130,42 +130,26 @@ const deleteAccount: any = async (req: Request, res: Response) => {
 };
 
 
-// show all tokens
+const getAccountTokensByAccountId: any = async (req: Request, res: Response) => {
 
-// const deleteAccount: any = async (req: Request, res: Response) => {
-//
-//     let data = fs.readFileSync(filePath, "utf8");
-//     const accounts = JSON.parse(data);
-//     let tokens = accounts.map((account: Account) => account.token);
-//
-//     for(let i=0; i<accounts.length; i++){
-//         console.log(accounts[i].token);
-//     }
-//
-//     res.send(tokens);
-//
-//
-//     // console.log(content);
-//     // const a = content.map(function (item) {
-//     //     return item.token;
-//     // });
-//
-//
-//     // let parse = JSON.parse("[" + content + "]");
-//     // console.log(parse);
-//
-//     // let map = parse.map(value => JSON.parse(value.token));
-//     // let map = parse.map(value => value.token);
-//     // console.log(map);
-//     // let contentArray = content.split("},");
-//     // let tokens = contentArray.map(value => JSON.parse(value));
-//
-//     // console.log(contentArray);
-//     // console.log(tokens);
-//     // console.log(JSON.parse(tokens));
-//
-//     // res.send(JSON.parse(tokens));
-// };
+    const id = req.params.id; // получаем id
+    const content = fs.readFileSync(filePath, "utf8");
+    const accounts = JSON.parse(content);
+    let account: Account = new Account();
+    // находим в массиве пользователя по id
+    for (let i = 0; i < accounts.length; i++) {
+        if (accounts[i].id == id) {
+            account = accounts[i];
+            break;
+        }
+    }
+    // отправляем пользователя
+    if (account) {
+        res.send(account.token);
+    } else {
+        res.status(404).send();
+    }
+};
 
-export default {getAccounts, getAccountsById, createAccount, updateAccount, deleteAccount};
+export default {getAccounts, getAccountById, createAccount, updateAccount, deleteAccount, getAccountTokensByAccountId};
 
