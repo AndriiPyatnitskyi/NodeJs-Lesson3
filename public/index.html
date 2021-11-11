@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width"/>
+    <title>Список пользователей</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body>
+<h2>Список пользователей</h2>
+<form name="accountForm">
+    <input type="hidden" name="id" value="0"/>
+    <div class="form-group">
+        <label for="name">Имя:</label>
+        <input class="form-control" name="name"/>
+    </div>
+    <div class="form-group">
+        <label for="age">Возраст:</label>
+        <input class="form-control" name="age"/>
+    </div>
+    <div class="panel-body">
+        <button type="submit" class="btn btn-sm btn-primary">Сохранить</button>
+        <a id="reset" class="btn btn-sm btn-primary">Сбросить</a>
+    </div>
+</form>
+<table class="table table-condensed table-striped table-bordered">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Имя</th>
+        <th>возраст</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<script>
+    // Получение всех пользователей
+    async function GetUsers() {
+        // отправляет запрос и получаем ответ
+        const response = await fetch("/api/accounts", {
+            method: "GET",
+            headers: {"Accept": "application/json"}
+        });
+        // если запрос прошел нормально
+        if (response.ok === true) {
+            // получаем данные
+            const accounts = await response.json();
+            let rows = document.querySelector("tbody");
+            accounts.forEach(account => {
+                // добавляем полученные элементы в таблицу
+                rows.append(row(account));
+            });
+        }
+    }
+
+    // Получение одного пользователя
+    async function GetUser(id) {
+        const response = await fetch("/api/accounts/" + id, {
+            method: "GET",
+            headers: {"Accept": "application/json"}
+        });
+        if (response.ok === true) {
+            const account = await response.json();
+            const form = document.forms["accountForm"];
+            form.elements["id"].value = account.id;
+            form.elements["name"].value = account.name;
+            form.elements["age"].value = account.age;
+        }
+    }
+
+    // Добавление пользователя
+    async function CreateUser(accountName, accountAge) {
+
+        const response = await fetch("api/accounts", {
+            method: "POST",
+            headers: {"Accept": "application/json", "Content-Type": "application/json"},
+            body: JSON.stringify({
+                name: accountName,
+                age: parseInt(accountAge, 10)
+            })
+        });
+        if (response.ok === true) {
+            const account = await response.json();
+            reset();
+            document.querySelector("tbody").append(row(account));
+        }
+    }
+
+    // Изменение пользователя
+    async function EditUser(accountId, accountName, accountAge) {
+        const response = await fetch("api/accounts", {
+            method: "PUT",
+            headers: {"Accept": "application/json", "Content-Type": "application/json"},
+            body: JSON.stringify({
+                id: accountId,
+                name: accountName,
+                age: parseInt(accountAge, 10)
+            })
+        });
+        if (response.ok === true) {
+            const account = await response.json();
+            reset();
+            document.querySelector("tr[data-rowid='" + account.id + "']").replaceWith(row(account));
+        }
+    }
+
+    // Удаление пользователя
+    async function DeleteUser(id) {
+        const response = await fetch("/api/accounts/" + id, {
+            method: "DELETE",
+            headers: {"Accept": "application/json"}
+        });
+        if (response.ok === true) {
+            const account = await response.json();
+            document.querySelector("tr[data-rowid='" + account.id + "']").remove();
+        }
+    }
+
+    // сброс формы
+    function reset() {
+        const form = document.forms["accountForm"];
+        form.reset();
+        form.elements["id"].value = 0;
+    }
+
+    // создание строки для таблицы
+    function row(account) {
+
+        const tr = document.createElement("tr");
+        tr.setAttribute("data-rowid", account.id);
+
+        const idTd = document.createElement("td");
+        idTd.append(account.id);
+        tr.append(idTd);
+
+        const nameTd = document.createElement("td");
+        nameTd.append(account.name);
+        tr.append(nameTd);
+
+        const ageTd = document.createElement("td");
+        ageTd.append(account.age);
+        tr.append(ageTd);
+
+        const linksTd = document.createElement("td");
+
+        const editLink = document.createElement("a");
+        editLink.setAttribute("data-id", account.id);
+        editLink.setAttribute("style", "cursor:pointer;padding:15px;");
+        editLink.append("Изменить");
+        editLink.addEventListener("click", e => {
+
+            e.preventDefault();
+            GetUser(account.id);
+        });
+        linksTd.append(editLink);
+
+        const removeLink = document.createElement("a");
+        removeLink.setAttribute("data-id", account.id);
+        removeLink.setAttribute("style", "cursor:pointer;padding:15px;");
+        removeLink.append("Удалить");
+        removeLink.addEventListener("click", e => {
+
+            e.preventDefault();
+            DeleteUser(account.id);
+        });
+
+        linksTd.append(removeLink);
+        tr.appendChild(linksTd);
+
+        return tr;
+    }
+
+    // сброс значений формы
+    document.getElementById("reset").click(function (e) {
+
+        e.preventDefault();
+        reset();
+    })
+
+    // отправка формы
+    document.forms["accountForm"].addEventListener("submit", e => {
+        e.preventDefault();
+        const form = document.forms["accountForm"];
+        const id = form.elements["id"].value;
+        const name = form.elements["name"].value;
+        const age = form.elements["age"].value;
+        if (id == 0)
+            CreateUser(name, age);
+        else
+            EditUser(id, name, age);
+    });
+
+    // загрузка пользователей
+    GetUsers();
+</script>
+</body>
+</html>
