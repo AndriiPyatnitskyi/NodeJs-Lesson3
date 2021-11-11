@@ -129,7 +129,7 @@ const deleteAccount: any = async (req: Request, res: Response) => {
 
 const getAccountTokensByAccountId: any = async (req: Request, res: Response) => {
 
-    const id = req.params.id; // получаем id
+    const id = +req.params.id; // получаем id
     const content = fs.readFileSync(filePath, "utf8");
     const accounts = JSON.parse(content);
     let account: Account = new Account();
@@ -152,13 +152,12 @@ const createAccountToken: any = async (req: Request, res: Response) => {
 
     if (!req.body) return res.sendStatus(400);
 
-    const accountId = req.params.id; // получаем id
+    const accountId: number = +req.params.id; // получаем id
 
     let data = fs.readFileSync(filePath, "utf8");
 
-
-    const accounts = JSON.parse(data);
-    let account;
+    const accounts: [Account] = JSON.parse(data);
+    let account: Account = new Account();
     for (let i = 0; i < accounts.length; i++) {
         if (accounts[i].id == accountId) {
             account = accounts[i];
