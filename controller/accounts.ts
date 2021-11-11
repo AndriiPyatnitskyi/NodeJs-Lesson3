@@ -1,7 +1,8 @@
-import express, { Request, Response} from 'express';
+import express, {Request, Response} from 'express';
 
 import * as fs from 'fs';
 import Account from "../model/account";
+
 const auth = require("../middleware/auth");
 const jwt = require("jsonwebtoken");
 const secretKey = "mySecretKey";
@@ -11,7 +12,7 @@ const secretKey = "mySecretKey";
 const filePath = "./accounts.json";
 
 const getAccounts: any = async (req: Request, res: Response) => {
-    const content = fs.readFileSync(filePath,"utf8");
+    const content = fs.readFileSync(filePath, "utf8");
     const accounts: [Account] = JSON.parse(content);
     res.send(accounts);
 };
@@ -23,24 +24,23 @@ const getAccountsById: any = async (req: Request, res: Response) => {
     const accounts = JSON.parse(content);
     let account = null;
     // находим в массиве пользователя по id
-    for(let i=0; i<accounts.length; i++){
-        if(accounts[i].id == id){
+    for (let i = 0; i < accounts.length; i++) {
+        if (accounts[i].id == id) {
             account = accounts[i];
             break;
         }
     }
     // отправляем пользователя
-    if(account){
+    if (account) {
         res.send(account);
-    }
-    else{
+    } else {
         res.status(404).send();
     }
 };
 
 const createAccount: any = async (req: Request, res: Response) => {
 
-    if(!req.body) return res.sendStatus(400);
+    if (!req.body) return res.sendStatus(400);
 
     const accountName: String = req.body.name;
     let account: Account = new Account();
@@ -74,7 +74,7 @@ const createAccount: any = async (req: Request, res: Response) => {
 
 const updateAccount: any = async (req: Request, res: Response) => {
 
-    if(!req.body) return res.sendStatus(400);
+    if (!req.body) return res.sendStatus(400);
 
     const accountId = req.params.id; // получаем id
     const accountName: String = req.body.name;
@@ -86,25 +86,86 @@ const updateAccount: any = async (req: Request, res: Response) => {
 
     const accounts = JSON.parse(data);
     let account;
-    for(let i = 0; i < accounts.length; i++){
-        if(accounts[i].id == accountId){
+    for (let i = 0; i < accounts.length; i++) {
+        if (accounts[i].id == accountId) {
             account = accounts[i];
             break;
         }
     }
-    console.log("!!!");
-    console.log(account);
+
     // изменяем данные у пользователя
-    if(account){
+    if (account) {
         account.name = accountName;
         data = JSON.stringify(accounts);
         fs.writeFileSync("accounts.json", data);
         res.send(account);
-    }
-    else{
+    } else {
         res.status(404).send(account);
     }
 };
 
-export default { getAccounts, getAccountsById, createAccount, updateAccount };
+const deleteAccount: any = async (req: Request, res: Response) => {
+
+    const id = req.params.id;
+    let data = fs.readFileSync(filePath, "utf8");
+    let accounts = JSON.parse(data);
+    let index = -1;
+    // находим индекс пользователя в массиве
+    for (var i = 0; i < accounts.length; i++) {
+        if (accounts[i].id == id) {
+            index = i;
+            break;
+        }
+    }
+    if (index > -1) {
+        // удаляем пользователя из массива по индексу
+        const account = accounts.splice(index, 1)[0];
+        data = JSON.stringify(accounts);
+        fs.writeFileSync(filePath, data);
+        // отправляем удаленного пользователя
+        res.send(account);
+    } else {
+        res.status(404).send();
+    }
+};
+
+
+// show all tokens
+
+// const deleteAccount: any = async (req: Request, res: Response) => {
+//
+//     let data = fs.readFileSync(filePath, "utf8");
+//     const accounts = JSON.parse(data);
+//     let tokens = accounts.map((account: Account) => account.token);
+//
+//     for(let i=0; i<accounts.length; i++){
+//         console.log(accounts[i].token);
+//     }
+//
+//     res.send(tokens);
+//
+//
+//     // console.log(content);
+//     // const a = content.map(function (item) {
+//     //     return item.token;
+//     // });
+//
+//
+//     // let parse = JSON.parse("[" + content + "]");
+//     // console.log(parse);
+//
+//     // let map = parse.map(value => JSON.parse(value.token));
+//     // let map = parse.map(value => value.token);
+//     // console.log(map);
+//     // let contentArray = content.split("},");
+//     // let tokens = contentArray.map(value => JSON.parse(value));
+//
+//     // console.log(contentArray);
+//     // console.log(tokens);
+//     // console.log(JSON.parse(tokens));
+//
+//     // res.send(JSON.parse(tokens));
+// };
+
+export default {getAccounts, getAccountsById, createAccount, updateAccount, deleteAccount};
 

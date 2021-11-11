@@ -7,6 +7,6 @@ router.get('/api/accounts', controller.getAccounts);
 router.get('/api/accounts/:id', controller.getAccountsById);
 router.post('/api/accounts', controller.createAccount);
 router.put('/api/accounts/:id', controller.updateAccount);
-// router.delete('/accounts/:id', controller.deleteAccount);
+router.delete('/api/accounts/:id', controller.deleteAccount);
 
 export default router;
