@@ -1,6 +1,6 @@
 const express = require("express");
 const fs = require("fs");
-const auth = require("./middleware/auth");
+const auth = require("../middleware/auth");
 const jwt = require("jsonwebtoken");
 const secretKey = "mySecretKey";
 
@@ -9,7 +9,7 @@ const jsonParser = express.json();
 
 app.use(express.static(__dirname + "/public"));
 
-const filePath = "accounts.json";
+const filePath = "../accounts.json";
 
 app.get("/api/accounts", function(req, res){
 
@@ -129,6 +129,42 @@ app.put("/api/accounts", jsonParser, function(req, res){
     else{
         res.status(404).send(account);
     }
+});
+
+
+app.get("/api/tokens", function(req, res){
+
+    let data = fs.readFileSync(filePath, "utf8");
+    const accounts = JSON.parse(data);
+    let tokens = accounts.map(account => account.token);
+
+    for(let i=0; i<accounts.length; i++){
+        console.log(accounts[i].token);
+    }
+
+    res.send(tokens);
+
+
+    // console.log(content);
+    // const a = content.map(function (item) {
+    //     return item.token;
+    // });
+
+
+    // let parse = JSON.parse("[" + content + "]");
+    // console.log(parse);
+
+    // let map = parse.map(value => JSON.parse(value.token));
+    // let map = parse.map(value => value.token);
+    // console.log(map);
+    // let contentArray = content.split("},");
+    // let tokens = contentArray.map(value => JSON.parse(value));
+
+    // console.log(contentArray);
+    // console.log(tokens);
+    // console.log(JSON.parse(tokens));
+
+    // res.send(JSON.parse(tokens));
 });
 
 app.listen(3000, function(){
