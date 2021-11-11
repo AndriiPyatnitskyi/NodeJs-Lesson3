@@ -1,5 +1,6 @@
 const express = require("express");
 const fs = require("fs");
+const auth = require("./middleware/auth");
 
 const app = express();
 const jsonParser = express.json();
@@ -21,8 +22,8 @@ app.get("/api/accounts/:id", function(req, res){
     const accounts = JSON.parse(content);
     let account = null;
     // находим в массиве пользователя по id
-    for(var i=0; i<accounts.length; i++){
-        if(accounts[i].id==id){
+    for(let i=0; i<accounts.length; i++){
+        if(accounts[i].id === id){
             account = accounts[i];
             break;
         }
@@ -67,7 +68,7 @@ app.delete("/api/accounts/:id", function(req, res){
     let index = -1;
     // находим индекс пользователя в массиве
     for(var i=0; i < accounts.length; i++){
-        if(accounts[i].id==id){
+        if(accounts[i].id === id){
             index=i;
             break;
         }
@@ -97,7 +98,7 @@ app.put("/api/accounts", jsonParser, function(req, res){
     const accounts = JSON.parse(data);
     let account;
     for(var i=0; i<accounts.length; i++){
-        if(accounts[i].id==accountId){
+        if(accounts[i].id === accountId){
             account = accounts[i];
             break;
         }
@@ -113,6 +114,99 @@ app.put("/api/accounts", jsonParser, function(req, res){
     else{
         res.status(404).send(account);
     }
+});
+
+
+app.post("/register", async (req, res) => {
+
+    // Our register logic starts here
+    try {
+        // Get user input
+        const { first_name, last_name, email, password } = req.body;
+
+        // Validate user input
+        if (!(email && password && first_name && last_name)) {
+            res.status(400).send("All input is required");
+        }
+
+        // check if user already exist
+        // Validate if user exist in our database
+        const oldUser = await User.findOne({ email });
+
+        if (oldUser) {
+            return res.status(409).send("User Already Exist. Please Login");
+        }
+
+        //Encrypt user password
+        encryptedPassword = await bcrypt.hash(password, 10);
+
+        // Create user in our database
+        const user = await User.create({
+            first_name,
+            last_name,
+            email: email.toLowerCase(), // sanitize: convert email to lowercase
+            password: encryptedPassword,
+        });
+
+        // Create token
+        const token = jwt.sign(
+            { user_id: user._id, email },
+            process.env.TOKEN_KEY,
+            {
+                expiresIn: "2h",
+            }
+        );
+        // save user token
+        user.token = token;
+
+        // return new user
+        res.status(201).json(user);
+    } catch (err) {
+        console.log(err);
+    }
+    // Our register logic ends here
+});
+
+app.post("/login", async (req, res) => {
+
+    // Our login logic starts here
+    try {
+        // Get user input
+        const { email, password } = req.body;
+
+        // Validate user input
+        if (!(email && password)) {
+            res.status(400).send("All input is required");
+        }
+        // Validate if user exist in our database
+        const user = await User.findOne({ email });
+
+        if (user && (await bcrypt.compare(password, user.password))) {
+            // Create token
+            const token = jwt.sign(
+                { user_id: user._id, email },
+                process.env.TOKEN_KEY,
+                {
+                    expiresIn: "2h",
+                }
+            );
+
+            // save user token
+            user.token = token;
+
+            // user
+            res.status(200).json(user);
+        }
+        res.status(400).send("Invalid Credentials");
+    } catch (err) {
+        console.log(err);
+    }
+    // Our register logic ends here
+});
+
+
+app.post("/welcome", auth, (req, res) => {
+    res.status(200).send("Welcome 🙌 ");
 });
 
 app.listen(3000, function(){
