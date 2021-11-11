@@ -1,4 +1,4 @@
-import express, {Request, Response} from 'express';
+import {Request, Response} from 'express';
 
 import * as fs from 'fs';
 import Account from "../model/account";

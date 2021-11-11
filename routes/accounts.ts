@@ -1,12 +1,11 @@
-
 import express from 'express';
 import controller from '../controller/accounts';
-const router = express.Router();
+const accountRouter = express.Router();
 
-router.get('/api/accounts', controller.getAccounts);
-router.get('/api/accounts/:id', controller.getAccountsById);
-router.post('/api/accounts', controller.createAccount);
-router.put('/api/accounts/:id', controller.updateAccount);
-router.delete('/api/accounts/:id', controller.deleteAccount);
+accountRouter.get('/api/accounts', controller.getAccounts);
+accountRouter.get('/api/accounts/:id', controller.getAccountsById);
+accountRouter.post('/api/accounts', controller.createAccount);
+accountRouter.put('/api/accounts/:id', controller.updateAccount);
+accountRouter.delete('/api/accounts/:id', controller.deleteAccount);
 
-export default router;
+export default accountRouter;

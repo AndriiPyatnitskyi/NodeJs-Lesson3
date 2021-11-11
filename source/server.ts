@@ -3,6 +3,7 @@ import http from 'http';
 import express, { Express } from 'express';
 import morgan from 'morgan';
 import accountRouter from '../routes/accounts';
+import tokenRouter from '../routes/tokens';
 
 const app = express();
 const router: Express = express();
@@ -30,6 +31,7 @@ router.use((req, res, next) => {
 
 /** Routes */
 router.use('/', accountRouter);
+router.use('/', tokenRouter);
 
 /** Error handling */
 router.use((req, res, next) => {
