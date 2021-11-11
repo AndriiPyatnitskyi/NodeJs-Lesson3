@@ -17,7 +17,6 @@ const getAccounts: any = async (req: Request, res: Response) => {
 };
 
 const getAccountsById: any = async (req: Request, res: Response) => {
-// app.get("/api/accounts/:id", function(req, res){
 
     const id = req.params.id; // получаем id
     const content = fs.readFileSync(filePath, "utf8");
@@ -73,8 +72,39 @@ const createAccount: any = async (req: Request, res: Response) => {
     res.send(account);
 };
 
+const updateAccount: any = async (req: Request, res: Response) => {
+
+    if(!req.body) return res.sendStatus(400);
+
+    const accountId = req.params.id; // получаем id
+    const accountName: String = req.body.name;
+
+    let data = fs.readFileSync(filePath, "utf8");
+
+    // console.log(JSON.parse(data));
 
 
+    const accounts = JSON.parse(data);
+    let account;
+    for(let i = 0; i < accounts.length; i++){
+        if(accounts[i].id == accountId){
+            account = accounts[i];
+            break;
+        }
+    }
+    console.log("!!!");
+    console.log(account);
+    // изменяем данные у пользователя
+    if(account){
+        account.name = accountName;
+        data = JSON.stringify(accounts);
+        fs.writeFileSync("accounts.json", data);
+        res.send(account);
+    }
+    else{
+        res.status(404).send(account);
+    }
+};
 
-export default { getAccounts, getAccountsById, createAccount };
+export default { getAccounts, getAccountsById, createAccount, updateAccount };
 

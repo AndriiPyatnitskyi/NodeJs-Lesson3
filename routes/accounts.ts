@@ -6,7 +6,7 @@ const router = express.Router();
 router.get('/api/accounts', controller.getAccounts);
 router.get('/api/accounts/:id', controller.getAccountsById);
 router.post('/api/accounts', controller.createAccount);
-// router.put('/accounts/:id', controller.updateAccount);
+router.put('/api/accounts/:id', controller.updateAccount);
 // router.delete('/accounts/:id', controller.deleteAccount);
 
 export default router;
