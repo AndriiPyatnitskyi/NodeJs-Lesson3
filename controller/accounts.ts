@@ -81,9 +81,6 @@ const updateAccount: any = async (req: Request, res: Response) => {
 
     let data = fs.readFileSync(filePath, "utf8");
 
-    // console.log(JSON.parse(data));
-
-
     const accounts = JSON.parse(data);
     let account;
     for (let i = 0; i < accounts.length; i++) {
@@ -151,5 +148,39 @@ const getAccountTokensByAccountId: any = async (req: Request, res: Response) => 
     }
 };
 
-export default {getAccounts, getAccountById, createAccount, updateAccount, deleteAccount, getAccountTokensByAccountId};
+const createAccountToken: any = async (req: Request, res: Response) => {
+
+    if (!req.body) return res.sendStatus(400);
+
+    const accountId = req.params.id; // получаем id
+
+    let data = fs.readFileSync(filePath, "utf8");
+
+
+    const accounts = JSON.parse(data);
+    let account;
+    for (let i = 0; i < accounts.length; i++) {
+        if (accounts[i].id == accountId) {
+            account = accounts[i];
+            break;
+        }
+    }
+
+    if (account) {
+        account.token = jwt.sign(
+                {account_name: account.name},
+                secretKey,
+                {
+                    expiresIn: "2h",
+                }
+            );
+        data = JSON.stringify(accounts);
+        fs.writeFileSync("accounts.json", data);
+        res.send(account);
+    } else {
+        res.status(404).send(account);
+    }
+};
+
+export default {getAccounts, getAccountById, createAccount, updateAccount, deleteAccount, getAccountTokensByAccountId, createAccountToken};
 
