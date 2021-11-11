@@ -24,7 +24,9 @@
     <tr>
         <th>Id</th>
         <th>Имя</th>
+        <th>Token</th>
         <th></th>
+
     </tr>
     </thead>
     <tbody>
@@ -131,6 +133,10 @@
         const nameTd = document.createElement("td");
         nameTd.append(account.name);
         tr.append(nameTd);
+
+        const tokenTd = document.createElement("td");
+        tokenTd.append(account.token);
+        tr.append(tokenTd);
 
         const linksTd = document.createElement("td");
 
