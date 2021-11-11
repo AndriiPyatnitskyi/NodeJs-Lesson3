@@ -3,10 +3,10 @@ import express from 'express';
 import controller from '../controller/accounts';
 const router = express.Router();
 
-router.get('/accounts', controller.getAccounts);
-// accountRouter.get('/accounts/:id', controller.getAccount);
-// accountRouter.put('/accounts/:id', controller.updateAccount);
-// accountRouter.delete('/accounts/:id', controller.deleteAccount);
-// accountRouter.post('/accounts', controller.addAccount);
+router.get('/api/accounts', controller.getAccounts);
+router.get('/api/accounts/:id', controller.getAccountsById);
+router.post('/api/accounts', controller.createAccount);
+// router.put('/accounts/:id', controller.updateAccount);
+// router.delete('/accounts/:id', controller.deleteAccount);
 
 export default router;
