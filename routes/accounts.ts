@@ -9,5 +9,6 @@ accountRouter.put('/api/accounts/:id', controller.updateAccount);
 accountRouter.delete('/api/accounts/:id', controller.deleteAccount);
 accountRouter.get('/api/accounts/:id/tokens', controller.getAccountTokensByAccountId);
 accountRouter.post('/api/accounts/:id/tokens', controller.createAccountToken);
+accountRouter.put('/api/accounts/:id/tokens', controller.updateAccountToken);
 
 export default accountRouter;
