@@ -1,6 +1,8 @@
 const express = require("express");
 const fs = require("fs");
 const auth = require("./middleware/auth");
+const jwt = require("jsonwebtoken");
+const secretKey = "mySecretKey";
 
 const app = express();
 const jsonParser = express.json();
@@ -8,12 +10,14 @@ const jsonParser = express.json();
 app.use(express.static(__dirname + "/public"));
 
 const filePath = "accounts.json";
+
 app.get("/api/accounts", function(req, res){
 
     const content = fs.readFileSync(filePath,"utf8");
     const accounts = JSON.parse(content);
     res.send(accounts);
 });
+
 // получение одного пользователя по id
 app.get("/api/accounts/:id", function(req, res){
 
@@ -42,8 +46,7 @@ app.post("/api/accounts", jsonParser, function (req, res) {
     if(!req.body) return res.sendStatus(400);
 
     const accountName = req.body.name;
-    const accountAge = req.body.age;
-    let account = {name: accountName, age: accountAge};
+    let account = {name: accountName};
 
     let data = fs.readFileSync(filePath, "utf8");
     let accounts = JSON.parse(data);
@@ -52,6 +55,17 @@ app.post("/api/accounts", jsonParser, function (req, res) {
     const id = Math.max.apply(Math,accounts.map(function(o){return o.id;}))
     // увеличиваем его на единицу
     account.id = id+1;
+
+    // Create token
+    // save user token
+    account.token = jwt.sign(
+        {account_name: account.name},
+        secretKey,
+        {
+            expiresIn: "2h",
+        }
+    );
+
     // добавляем пользователя в массив
     accounts.push(account);
     data = JSON.stringify(accounts);
@@ -59,6 +73,7 @@ app.post("/api/accounts", jsonParser, function (req, res) {
     fs.writeFileSync("accounts.json", data);
     res.send(account);
 });
+
 // удаление пользователя по id
 app.delete("/api/accounts/:id", function(req, res){
 

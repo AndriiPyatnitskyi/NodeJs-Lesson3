@@ -14,10 +14,6 @@
         <label for="name">Имя:</label>
         <input class="form-control" name="name"/>
     </div>
-    <div class="form-group">
-        <label for="age">Возраст:</label>
-        <input class="form-control" name="age"/>
-    </div>
     <div class="panel-body">
         <button type="submit" class="btn btn-sm btn-primary">Сохранить</button>
         <a id="reset" class="btn btn-sm btn-primary">Сбросить</a>
@@ -28,7 +24,6 @@
     <tr>
         <th>Id</th>
         <th>Имя</th>
-        <th>возраст</th>
         <th></th>
     </tr>
     </thead>
@@ -67,19 +62,17 @@
             const form = document.forms["accountForm"];
             form.elements["id"].value = account.id;
             form.elements["name"].value = account.name;
-            form.elements["age"].value = account.age;
         }
     }
 
     // Добавление пользователя
-    async function CreateUser(accountName, accountAge) {
+    async function CreateUser(accountName) {
 
         const response = await fetch("api/accounts", {
             method: "POST",
             headers: {"Accept": "application/json", "Content-Type": "application/json"},
             body: JSON.stringify({
-                name: accountName,
-                age: parseInt(accountAge, 10)
+                name: accountName
             })
         });
         if (response.ok === true) {
@@ -96,8 +89,7 @@
             headers: {"Accept": "application/json", "Content-Type": "application/json"},
             body: JSON.stringify({
                 id: accountId,
-                name: accountName,
-                age: parseInt(accountAge, 10)
+                name: accountName
             })
         });
         if (response.ok === true) {
@@ -139,10 +131,6 @@
         const nameTd = document.createElement("td");
         nameTd.append(account.name);
         tr.append(nameTd);
-
-        const ageTd = document.createElement("td");
-        ageTd.append(account.age);
-        tr.append(ageTd);
 
         const linksTd = document.createElement("td");
 
@@ -186,11 +174,11 @@
         const form = document.forms["accountForm"];
         const id = form.elements["id"].value;
         const name = form.elements["name"].value;
-        const age = form.elements["age"].value;
-        if (id == 0)
-            CreateUser(name, age);
+
+        if (id === 0)
+            CreateUser(name);
         else
-            EditUser(id, name, age);
+            EditUser(id, name);
     });
 
     // загрузка пользователей
