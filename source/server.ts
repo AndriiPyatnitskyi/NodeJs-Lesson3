@@ -4,19 +4,23 @@ import express, { Express } from 'express';
 import morgan from 'morgan';
 import accountRouter from '../routes/accounts';
 import tokenRouter from '../routes/tokens';
+import swaggerUi from 'swagger-ui-express';
+const swaggerDocument = require('./swagger.json');
 
-const app = express();
-const router: Express = express();
+const app: Express = express();
+
+/** Swagger */
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 /** Logging */
-router.use(morgan('dev'));
+app.use(morgan('dev'));
 /** Parse the request */
-router.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false }));
 /** Takes care of JSON data */
-router.use(express.json());
+app.use(express.json());
 
 /** RULES OF OUR API */
-router.use((req, res, next) => {
+app.use((req, res, next) => {
     // set the CORS policy
     res.header('Access-Control-Allow-Origin', '*');
     // set the CORS headers
@@ -30,11 +34,11 @@ router.use((req, res, next) => {
 });
 
 /** Routes */
-router.use('/', accountRouter);
-router.use('/', tokenRouter);
+app.use('/', accountRouter);
+app.use('/', tokenRouter);
 
 /** Error handling */
-router.use((req, res, next) => {
+app.use((req, res, next) => {
     const error = new Error('not found');
     return res.status(404).json({
         message: error.message
@@ -42,7 +46,6 @@ router.use((req, res, next) => {
 });
 
 /** Server */
-
-const httpServer = http.createServer(router);
+const httpServer = http.createServer(app);
 const PORT: any = process.env.PORT ?? 6062;
 httpServer.listen(PORT, () => console.log(`The server is running on port ${PORT}`));

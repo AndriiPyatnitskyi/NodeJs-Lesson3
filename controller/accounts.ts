@@ -183,7 +183,6 @@ const createAccountToken: any = async (req: Request, res: Response) => {
 
 const updateAccountToken: any = async (req: Request, res: Response) => {
 
-
     if (!req.body) return res.sendStatus(400);
 
     const accountId = req.params.id; // получаем id
