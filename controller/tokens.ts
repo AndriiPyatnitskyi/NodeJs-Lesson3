@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 
 import * as fs from 'fs';
-import Account from "../model/account";
+import { Account } from "../model/account";
 
 const auth = require("../middleware/auth");
 const jwt = require("jsonwebtoken");

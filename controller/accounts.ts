@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 
 import * as fs from 'fs';
-import Account from "../model/account";
+import {Role, Account} from "../model/account";
 
 const auth = require("../middleware/auth");
 const jwt = require("jsonwebtoken");
@@ -43,6 +43,7 @@ const createAccount: any = async (req: Request, res: Response) => {
     if (!req.body) return res.sendStatus(400);
 
     const accountName: String = req.body.name;
+    const accountRole: Role = req.body.role;
     let account: Account = new Account();
     account.name = accountName;
 
@@ -51,18 +52,21 @@ const createAccount: any = async (req: Request, res: Response) => {
 
     // находим максимальный id
     const id: number = Math.max.apply(Math, accounts.map((o: Account) => o.id));
-    // увеличиваем его на единицу
-    account.id = id + 1;
+    account.id = isFinite(id) ? id + 1: 0;
+
+    account.role = accountRole ? accountRole : Role.USER;
+
 
     // Create token
     // save user token
     account.token = jwt.sign(
-        {account_name: account.name},
+        {account_name: account.name, role: account.role},
         secretKey,
         {
             expiresIn: "2h",
         }
     );
+
 
     // добавляем пользователя в массив
     accounts.push(account);

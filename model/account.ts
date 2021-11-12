@@ -2,6 +2,11 @@ class Account {
     id  : number;
     name: String;
     token: String;
+    role: Role;
 }
 
-export default Account;
+enum Role {
+    USER = "USER", ADMIN = "ADMIN"
+}
+
+export { Account, Role };

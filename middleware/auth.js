@@ -1,12 +1,10 @@
 const jwt = require("jsonwebtoken");
 
 const config = process.env;
+const secretKey = "mySecretKey";
+
 
 const verifyToken = (req, res, next) => {
-
-    // if (typeof(req.body?.token) == 'undefined') {
-    //     return res.status(403).send("A token is required for authentication");
-    // }
 
     const token =
         req.body?.token || req.query.token || req.headers["x-access-token"];
@@ -15,8 +13,10 @@ const verifyToken = (req, res, next) => {
         return res.status(403).send("A token is required for authentication");
     }
     try {
-        req.user = jwt.verify(token, config.TOKEN_KEY);
+        req.user = jwt.verify(token, secretKey);
+        console.log(req.user.role);
     } catch (err) {
+        console.log(err);
         return res.status(401).send("Invalid Token");
     }
     return next();
