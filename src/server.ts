@@ -1,12 +1,12 @@
 /** source/server.ts */
 import http from 'http';
-import express, { Express } from 'express';
+import express, {Express} from 'express';
 import morgan from 'morgan';
-import accountRouter from '../routes/accounts';
-import tokenRouter from '../routes/tokens';
+import accountRouter from './routes/accounts';
+import tokenRouter from './routes/tokens';
 import swaggerUi from 'swagger-ui-express';
-const swaggerDocument = require('./swagger.json');
 
+const swaggerDocument = require('./swagger.json');
 const app: Express = express();
 
 /** Swagger */
@@ -15,7 +15,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 /** Logging */
 app.use(morgan('dev'));
 /** Parse the request */
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 /** Takes care of JSON data */
 app.use(express.json());
 

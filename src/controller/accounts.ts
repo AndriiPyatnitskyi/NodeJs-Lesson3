@@ -7,8 +7,6 @@ const auth = require("../middleware/auth");
 const jwt = require("jsonwebtoken");
 const secretKey = "mySecretKey";
 
-// app.use(express.static(__dirname + "/public"));
-
 const filePath = "./accounts.json";
 
 const getAccounts: any = async (req: Request, res: Response) => {
@@ -18,19 +16,18 @@ const getAccounts: any = async (req: Request, res: Response) => {
 };
 
 const getAccountById: any = async (req: Request, res: Response) => {
-
-    const id = req.params.id; // получаем id
+    const id = req.params.id;
     const content = fs.readFileSync(filePath, "utf8");
     const accounts = JSON.parse(content);
     let account = null;
-    // находим в массиве пользователя по id
+
     for (let i = 0; i < accounts.length; i++) {
         if (accounts[i].id == id) {
             account = accounts[i];
             break;
         }
     }
-    // отправляем пользователя
+
     if (account) {
         res.send(account);
     } else {
@@ -39,7 +36,6 @@ const getAccountById: any = async (req: Request, res: Response) => {
 };
 
 const createAccount: any = async (req: Request, res: Response) => {
-
     if (!req.body) return res.sendStatus(400);
 
     const accountName: String = req.body.name;
@@ -50,15 +46,11 @@ const createAccount: any = async (req: Request, res: Response) => {
     let data = fs.readFileSync(filePath, "utf8");
     let accounts = JSON.parse(data);
 
-    // находим максимальный id
     const id: number = Math.max.apply(Math, accounts.map((o: Account) => o.id));
-    account.id = isFinite(id) ? id + 1: 0;
+    account.id = isFinite(id) ? id + 1 : 0;
 
     account.role = accountRole ? accountRole : Role.USER;
 
-
-    // Create token
-    // save user token
     account.token = jwt.sign(
         {account_name: account.name, role: account.role},
         secretKey,
@@ -67,20 +59,16 @@ const createAccount: any = async (req: Request, res: Response) => {
         }
     );
 
-
-    // добавляем пользователя в массив
     accounts.push(account);
     data = JSON.stringify(accounts);
-    // перезаписываем файл с новыми данными
     fs.writeFileSync("accounts.json", data);
     res.send(account);
 };
 
 const updateAccount: any = async (req: Request, res: Response) => {
-
     if (!req.body) return res.sendStatus(400);
 
-    const accountId = req.params.id; // получаем id
+    const accountId = req.params.id;
     const accountName: String = req.body.name;
 
     let data = fs.readFileSync(filePath, "utf8");
@@ -94,7 +82,6 @@ const updateAccount: any = async (req: Request, res: Response) => {
         }
     }
 
-    // изменяем данные у пользователя
     if (account) {
         account.name = accountName;
         data = JSON.stringify(accounts);
@@ -106,45 +93,39 @@ const updateAccount: any = async (req: Request, res: Response) => {
 };
 
 const deleteAccount: any = async (req: Request, res: Response) => {
-
     const id = req.params.id;
     let data = fs.readFileSync(filePath, "utf8");
     let accounts = JSON.parse(data);
     let index = -1;
-    // находим индекс пользователя в массиве
-    for (var i = 0; i < accounts.length; i++) {
+
+    for (let i = 0; i < accounts.length; i++) {
         if (accounts[i].id == id) {
             index = i;
             break;
         }
     }
     if (index > -1) {
-        // удаляем пользователя из массива по индексу
         const account = accounts.splice(index, 1)[0];
         data = JSON.stringify(accounts);
         fs.writeFileSync(filePath, data);
-        // отправляем удаленного пользователя
         res.send(account);
     } else {
         res.status(404).send();
     }
 };
 
-
 const getAccountTokensByAccountId: any = async (req: Request, res: Response) => {
-
-    const id = +req.params.id; // получаем id
+    const id = +req.params.id;
     const content = fs.readFileSync(filePath, "utf8");
     const accounts = JSON.parse(content);
     let account: Account = new Account();
-    // находим в массиве пользователя по id
     for (let i = 0; i < accounts.length; i++) {
         if (accounts[i].id == id) {
             account = accounts[i];
             break;
         }
     }
-    // отправляем пользователя
+
     if (account) {
         res.send(account.token);
     } else {
@@ -153,10 +134,9 @@ const getAccountTokensByAccountId: any = async (req: Request, res: Response) => 
 };
 
 const createAccountToken: any = async (req: Request, res: Response) => {
-
     if (!req.body) return res.sendStatus(400);
 
-    const accountId: number = +req.params.id; // получаем id
+    const accountId: number = +req.params.id;
 
     let data = fs.readFileSync(filePath, "utf8");
 
@@ -171,12 +151,13 @@ const createAccountToken: any = async (req: Request, res: Response) => {
 
     if (account) {
         account.token = jwt.sign(
-                {account_name: account.name},
-                secretKey,
-                {
-                    expiresIn: "2h",
-                }
-            );
+            {account_name: account.name},
+            secretKey,
+            {
+                expiresIn: "2h",
+            }
+        );
+
         data = JSON.stringify(accounts);
         fs.writeFileSync("accounts.json", data);
         res.send(account);
@@ -186,10 +167,9 @@ const createAccountToken: any = async (req: Request, res: Response) => {
 };
 
 const updateAccountToken: any = async (req: Request, res: Response) => {
-
     if (!req.body) return res.sendStatus(400);
 
-    const accountId = req.params.id; // получаем id
+    const accountId = req.params.id
     const accountSourceToken: String = req.body.sourceToken;
     const accountTargetToken: String = req.body.targetToken;
 
@@ -215,10 +195,9 @@ const updateAccountToken: any = async (req: Request, res: Response) => {
 };
 
 const deleteAccountToken: any = async (req: Request, res: Response) => {
-
     if (!req.body) return res.sendStatus(400);
 
-    const accountId = req.params.id; // получаем id
+    const accountId = req.params.id;
     const accountSourceToken: String = req.body.sourceToken;
 
     let data = fs.readFileSync(filePath, "utf8");
@@ -242,5 +221,15 @@ const deleteAccountToken: any = async (req: Request, res: Response) => {
     }
 };
 
-export default {getAccounts, getAccountById, createAccount, updateAccount, deleteAccount, getAccountTokensByAccountId, createAccountToken, updateAccountToken, deleteAccountToken};
+export default {
+    getAccounts,
+    getAccountById,
+    createAccount,
+    updateAccount,
+    deleteAccount,
+    getAccountTokensByAccountId,
+    createAccountToken,
+    updateAccountToken,
+    deleteAccountToken
+};
 

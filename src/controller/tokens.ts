@@ -1,13 +1,7 @@
 import {Request, Response} from 'express';
 
 import * as fs from 'fs';
-import { Account } from "../model/account";
-
-const auth = require("../middleware/auth");
-const jwt = require("jsonwebtoken");
-const secretKey = "mySecretKey";
-
-// app.use(express.static(__dirname + "/public"));
+import {Account} from "../model/account";
 
 const filePath = "./accounts.json";
 
@@ -17,6 +11,5 @@ const getTokens: any = async (req: Request, res: Response) => {
     res.send(accounts.map(account => account.token));
 };
 
-
-export default { getTokens };
+export default {getTokens};
 
